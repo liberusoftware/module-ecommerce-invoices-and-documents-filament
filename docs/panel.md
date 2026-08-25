@@ -76,6 +76,12 @@ document's reference, which is a natural key: pressing the button twice cannot r
 it does not even reach the index — the domain counts every credit note already raised against the
 document, drafts included, and refuses the second by arithmetic.
 
+The domain's `docs/domain.md` says a credit note's `source_ref` is *the refund reference*, because a
+refund is the cause. A merchant crediting a document from this screen has no refund reference to
+give, and the panel will not invent one, so the corrected document is the cause here. Both are
+natural keys and both are opaque to the module; a host that raises credit notes from its refunds
+module should pass the refund reference through the API package rather than this screen.
+
 A partial credit note is a real requirement and it belongs in the domain: an action taking line
 positions and quantities, doing the proportional arithmetic where the rest of the arithmetic lives.
 It is reported as a gap, not implemented here.
