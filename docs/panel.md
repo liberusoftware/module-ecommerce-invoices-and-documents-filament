@@ -157,3 +157,10 @@ Reported rather than closed here, per the presentation brief:
    That is the conservative choice and it is probably right, but it means a draft credit note that is
    later voided still has to be voided before another can be raised. It is stated here because it is
    not written down in the domain's docs.
+6. **`BurnedNumber` has no immutability guard.** `DocumentEvent`, `DocumentLine` and `Document` all
+   refuse `updating` and `deleting` in model hooks, and the domain's own docs say each unique index
+   has a matching guard. A burned number is an audit row that never changes after it is written and
+   is the only thing that accounts for a hole in a series, and it can be updated or deleted through
+   Eloquent. This package's `SeriesTest` deletes one to manufacture the alarm it renders, which is
+   how the gap was found. `DeliveryAttempt` is unguarded for a reason — its state, detail and
+   redaction do change — so this is about `BurnedNumber` alone.
