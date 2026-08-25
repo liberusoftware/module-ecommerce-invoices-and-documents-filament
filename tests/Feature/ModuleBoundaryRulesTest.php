@@ -82,7 +82,7 @@ it('registers everything through the plugin and nothing from the service provide
 it('declares every class the manifest names for the panel', function (): void {
     $manifest = packageJson('module.json');
 
-    expect($manifest['presentation']['filament']['admin'])->toBe([InvoicesAndDocumentsPlugin::class]);
+    expect($manifest['presentation']['filament']['app'])->toBe([InvoicesAndDocumentsPlugin::class]);
 
     foreach ($manifest['presentation']['filament'] as $plugins) {
         foreach ($plugins as $plugin) {
@@ -264,7 +264,7 @@ it('carries no session identifier in any file', function (): void {
 
 it('contributes nothing when a panel boots it, so nothing can arrive on a panel that did not register it', function (): void {
     $plugin = InvoicesAndDocumentsPlugin::make();
-    $plugin->boot(Filament::getPanel('admin'));
+    $plugin->boot(Filament::getPanel('app'));
 
     expect($plugin->getId())->toBe('ecommerce-invoices-and-documents');
 });

@@ -15,8 +15,8 @@ final class TestPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('admin')
-            ->path('admin')
+            ->id('app')
+            ->path('app')
             ->plugin(
                 InvoicesAndDocumentsPlugin::make()
                     ->tenantUsing(fn (): string => TestTenant::current())

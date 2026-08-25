@@ -37,6 +37,10 @@ public function panel(Panel $panel): Panel
 }
 ```
 
+The manifest names the **`app`** panel, because that is where this host keeps a merchant's own
+screens and where its invoice resource lived. Both host panels resolve `Team` tenancy, so either
+would scope correctly; `app` is the merchant-facing one.
+
 **`tenantUsing` is the merchant, not the store.** In this host's vocabulary that is the `Team`: a
 `Channel` belongs to a `Store` and a `Store` to a `Team`, and the obligation to file documents is the
 merchant's. Without a resolver the plugin falls back to `Filament::getTenant()`, and a panel with
