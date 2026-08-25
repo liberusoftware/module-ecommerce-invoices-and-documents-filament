@@ -1,0 +1,42 @@
+{
+    "name": "ecommerce-invoices-and-documents-filament",
+    "version": "0.1.0",
+    "description": "The filing cabinet: a Filament panel over the documents a sale produces, their frozen lines, the series they are numbered from, the credit notes that correct them and the attempts to deliver them.",
+    "category": "presentation",
+    "provider": "Liberu\\Ecommerce\\InvoicesAndDocuments\\Filament\\InvoicesAndDocumentsFilamentServiceProvider",
+    "requires": {
+        "packages": {
+            "liberusoftware/ecommerce-invoices-and-documents": "^0.1"
+        }
+    },
+    "presentation": {
+        "filament": {
+            "app": [
+                "Liberu\\Ecommerce\\InvoicesAndDocuments\\Filament\\InvoicesAndDocumentsPlugin"
+            ]
+        }
+    },
+    "features": [
+        "There is no create page, no edit page and no delete action anywhere in this package, and the suite fails if one arrives",
+        "A document is corrected by raising a credit note against it, and a draft is discarded by being voided; both write an audit row",
+        "Every write is a published domain action, so nothing in this package reaches Eloquent to save, update or delete",
+        "Every write re-reads the document through FindDocument, so the guard runs against the row rather than against the screen",
+        "A move the document cannot make from where it stands is not offered, and asking for one anyway is refused rather than done",
+        "Every mutation reports which of three things happened: recorded, already recorded, or refused and why",
+        "All twenty refusal reasons the domain publishes have a sentence, and a twenty-first would fail the suite rather than a merchant",
+        "A refused delivery says whether the attempt row was written, because an unbound transport leaves one and a missing address does not",
+        "Every total is summed from the document's own frozen lines on read, and no column on any screen holds one",
+        "Every amount carries the currency it was frozen with, and no screen prints a currency symbol of its own",
+        "Tax is shown per line and summarised per distinct rate, because a document stating only a gross total is not a valid VAT invoice",
+        "A document with no number renders as not numbered, which for a proforma is correct rather than missing",
+        "A proforma is issued without a series, because it may not be filed under a fiscal one",
+        "The series select is searched and bounded, never a pluck of the table at form-build time",
+        "A series' continuity is reconciled on read, and a number unaccounted for is named as an external event rather than a cleanup",
+        "A gapless series is not offered the burn control, and burning one anyway is refused rather than done",
+        "A retention window the host never configured renders as unknown rather than as none",
+        "No renderer configured is stated on the record as the fact it is, and the document is still numbered, filed, listed and deliverable",
+        "The buyer's email is on the record screen and on no listing",
+        "Viewing a document is answered by the domain's CustodyPolicy, and every other Filament ability is forced closed by name",
+        "Another merchant's reference and one that does not exist raise the same exception on every screen"
+    ]
+}

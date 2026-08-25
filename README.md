@@ -1,84 +1,66 @@
-# Ecommerce: Invoices and Documents Filament
+# ecommerce-invoices-and-documents-filament
 
-> This optional Filament 5 presentation package presents exactly one independent domain module. It contributes reusable resources, pages, widgets, schemas, tables, infolists, and actions to application-owned panels while delegating authorization, validation, tenancy, persistence, and business rules to the ecommerce-invoices-and-documents public bou
+The filing cabinet. A Filament panel over
+[`liberusoftware/ecommerce-invoices-and-documents`](https://github.com/liberusoftware/module-ecommerce-invoices-and-documents):
+the documents a sale produced, the lines each one froze, the series they are numbered from, the
+credit notes that correct them and every attempt to put one in front of somebody.
 
-[Software](https://liberusoftware.com) ·
-[Hosting](https://liberuhosting.com) ·
-[Services](https://liberuservices.com) ·
-[Liberu Group](https://liberugroup.com)
+It is a one-to-one adapter. It contains no business rules: every decision is a published domain
+action, query or policy, and every figure is one the domain sums on read.
 
-![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white) ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white) ![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)
-[![Latest release](https://img.shields.io/github/v/release/liberusoftware/module-ecommerce-invoices-and-documents-filament?sort=semver)](https://github.com/liberusoftware/module-ecommerce-invoices-and-documents-filament/releases/latest) [![Tests](https://github.com/liberusoftware/module-ecommerce-invoices-and-documents-filament/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/liberusoftware/module-ecommerce-invoices-and-documents-filament/actions/workflows/tests.yml)
+## The three faults it is shaped around
 
-## Features
+**A financial document had an edit form, a delete action and a bulk delete.** The host's
+`InvoiceResource` shipped `EditAction` and `DeleteBulkAction`, its list page shipped `CreateAction`,
+its edit page shipped `DeleteAction`, and its form's total was a free-text field. Nothing wrote an
+audit row for any of it, and the deletes were unrecoverable — `invoices` has no soft deletes while
+`InvoicePolicy` publishes `restore` and `forceDelete` as if it did. So here there is no create page,
+no edit page and no delete control anywhere; a document is corrected by raising a credit note and
+discarded by being voided, and both write a row on the ledger. That is a test, not a convention.
 
-- Fully compatible with **Laravel 13**, **PHP 8.5**, and **Pest 5**.
-- Built following the domain-driven design guidelines of the Liberu architecture.
-- Reusable, presenting a clean public contract and boundaries.
-- Adheres to the strict database, security, and authorization standards of Liberu.
+**Two form selects loaded whole tables.** `Customer::pluck(...)` and `Order::pluck(...)`, both
+evaluated at form-build time, both deployment-wide. The one select here is searched as you type over
+this merchant's own series and bounded to fifty results — and because the search is what validates
+it, another merchant's series code is not merely hidden, it is refused.
 
-## Requirements
+**The invoice had no number, so the panel printed the primary key.** What a customer saw under
+"Invoice #" was the `invoices` auto-increment key, shared across every merchant on the deployment.
+Every screen here is keyed on the reference this module mints, and the number a document is filed
+under comes from a series the merchant opened.
 
-- **PHP 8.5**
-- **Composer 2**
-- A supported database (e.g. MySQL, PostgreSQL, SQLite)
+## What it publishes
 
-## Quick start
+| | |
+|---|---|
+| `InvoicesAndDocumentsPlugin` | The entry point. The host attaches it to the panels it means to. |
+| **Documents** | Every document, its frozen lines, its per-rate tax block, its deliveries, its credit notes and its history. Draft from a sale, issue, send, credit in full, void. |
+| **Numbering** | The series this merchant files under, what each has spent, and whether anything is unaccounted for. Open one, burn a number where the series allows it. |
 
-To install this package via Composer, run:
+## What it does not do
+
+- **No figure is ever a zero it did not measure.** A document with no number reads as not numbered, a
+  retention window nobody configured reads as unknown, and a panel with no renderer says so rather
+  than offering an empty file.
+- **No partial credit note.** Crediting part of a document is arithmetic, and arithmetic belongs to
+  the domain. The panel copies the whole of a document's frozen lines onto a credit note; a partial
+  one needs a domain action that does not exist yet — see [`docs/panel.md`](docs/panel.md).
+- **No numbered proforma.** A proforma may not be filed under a fiscal series, so this panel issues
+  one unnumbered rather than offering a second class of series to choose between.
+- **No erasure and no export screen.** `ForgetParticipant` and `ExportParticipantRecord` walk one
+  person across every merchant on the deployment. A merchant panel is the wrong place for either.
+- **No renderer and no PDF.** Rendering is an unbound seam. This panel names the fact and delivers
+  through whatever the host bound.
+- **No create, no edit, no delete, anywhere.**
+
+## Installing
 
 ```bash
-composer require liberusoftware/module-ecommerce-invoices-and-documents-filament
+composer require liberusoftware/ecommerce-invoices-and-documents-filament
 ```
 
-## Documentation
+Nothing boots on install: the module manager registers the provider when the module is named in
+`MODULES_ENABLED`. Attaching the panel is one call — see [`docs/adoption.md`](docs/adoption.md).
 
-- [Liberu Main Documentation](https://github.com/liberusoftware/documentation)
-- [Architecture & Standards Index](https://github.com/liberusoftware/documentation/tree/main/architecture)
-
-## Related Liberu Projects
-
-| Project | Repository | Purpose |
-| --- | --- | --- |
-| **Boilerplate** | [liberusoftware/boilerplate-laravel](https://github.com/liberusoftware/boilerplate-laravel) | Shared Laravel application foundation and reference composition |
-| **CMS** | [liberu-cms/cms-laravel](https://github.com/liberu-cms/cms-laravel) | Structured content, publishing, media, multisite, and headless delivery |
-| **CRM** | [liberu-crm/crm-laravel](https://github.com/liberu-crm/crm-laravel) | Customer data, sales, marketing, service, and customer success |
-| **Billing** | [liberu-billing/billing-laravel](https://github.com/liberu-billing/billing-laravel) | Products, subscriptions, invoicing, payments, and provisioning |
-| **Accounting** | [liberu-accounting/accounting-laravel](https://github.com/liberu-accounting/accounting-laravel) | Ledgers, banking, tax, expenses, close, and financial reporting |
-| **Ecommerce** | [liberu-ecommerce/ecommerce-laravel](https://github.com/liberu-ecommerce/ecommerce-laravel) | Catalog, checkout, orders, fulfillment, returns, B2B, and omnichannel commerce |
-| **Control Panel** | [liberu-control-panel/control-panel-laravel](https://github.com/liberu-control-panel/control-panel-laravel) | Hosting, infrastructure, DNS, mail, databases, backups, and security operations |
-| **Automation** | [liberu-automation/automation-laravel](https://github.com/liberu-automation/automation-laravel) | Governed workflows, provider-neutral AI, approvals, and connectors |
-
-## Security
-
-Please do not report security vulnerabilities through public GitHub issues.
-Follow our [Security Policy](https://github.com/liberusoftware/documentation/blob/main/architecture/SECURITY.md) for private reporting and supported versions.
-
-## License
-
-This project is open-source software. You may use, modify, and distribute it
-under the terms described in [LICENSE.md](LICENSE.md).
-
-The linked license text is authoritative; this summary is not legal advice.
-
-## Feedback and contributing
-
-Feedback and contributions are welcome. You can help by reporting reproducible
-bugs, proposing focused enhancements, improving documentation or translations,
-and submitting tested code changes.
-
-Before contributing, please read [CONTRIBUTING.md](https://github.com/liberusoftware/documentation/blob/main/standards/CONTRIBUTING.md) and our
-[Code of Conduct](https://github.com/liberusoftware/documentation/blob/main/architecture/CODE_OF_CONDUCT.md). Search existing issues first, then use
-the appropriate issue template. Pull requests should explain the problem and
-approach, remain focused, include or update tests, pass the required workflows,
-and document user-visible or breaking changes.
-
-## Contributors
-
-Thank you to everyone who helps improve Liberu.
-
-<a href="https://github.com/liberusoftware/module-ecommerce-invoices-and-documents-filament/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=liberusoftware/module-ecommerce-invoices-and-documents-filament" alt="Contributors to liberusoftware/module-ecommerce-invoices-and-documents-filament">
-</a>
-
-[View the full contributors graph](https://github.com/liberusoftware/module-ecommerce-invoices-and-documents-filament/graphs/contributors).
+Why every screen is shaped the way it is, including the shapes that were rejected, is in
+[`docs/panel.md`](docs/panel.md). What breaks and what to do about it is in
+[`docs/runbook.md`](docs/runbook.md).
