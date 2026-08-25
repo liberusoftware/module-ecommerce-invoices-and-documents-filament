@@ -35,21 +35,10 @@ use UnitEnum;
 /**
  * One merchant's documents, and everything each one says.
  *
- * There is no create page, no edit page and no delete action. The host's
- * `InvoiceResource` shipped all four plus a free-text total, wrote no audit row
- * for any of it, and its deletes were unrecoverable — `invoices` has no soft
- * deletes while `InvoicePolicy` publishes `restore` and `forceDelete` as if it
- * did. Here a document is corrected by a credit note and discarded by being
- * voided, and both record.
- *
- * Every figure on these screens is summed from the document's own frozen lines
- * on read. The host printed a header total copied from the order while only
- * product lines were copied into the invoice, so the two disagreed from the day
- * it was written.
- *
- * The route key is the reference this module mints. The host showed customers
- * the `invoices` primary key and called it "Invoice #", which enumerates every
- * document on the deployment and is not a valid invoice number anywhere.
+ * No create page, no edit page, no delete action; every total summed from the
+ * document's own frozen lines on read; the route key the reference this module
+ * mints. The host's `InvoiceResource` had the opposite of each, and `docs/panel.md`
+ * carries which fault produced which decision.
  */
 final class DocumentResource extends Resource
 {
